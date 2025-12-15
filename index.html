@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Mobile-first Android-friendly header with compact design -->
+    <div class="app-header">
+        <div class="header-top">
+            <h1 class="app-title">Expense Tracker</h1>
+            <button class="icon-btn" onclick="showModal('newMonthModal')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+        <p class="month-period" id="currentMonthPeriod">Loading...</p>
+        
+        <div class="balance-card">
+            <div class="balance-amount" id="availableBalance">₹0</div>
+            <div class="balance-label">Available Balance</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value positive" id="totalReceived">₹0</div>
+                <div class="stat-label">Received</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value warning" id="totalSavings">₹0</div>
+                <div class="stat-label">Savings</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value negative" id="totalSpent">₹0</div>
+                <div class="stat-label">Spent</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content with mobile-optimized sections -->
+    <div class="app-content">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <div class="section-card">
+                <h2 class="section-title">Recent Expenses</h2>
+                <div id="recentExpenses" class="transaction-list"></div>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">Pending Loans</h2>
+                <div id="pendingLoans" class="transaction-list"></div>
+            </div>
+        </div>
+
+        <!-- Expenses Section -->
+        <div id="expenses" class="content-section">
+            <div class="section-card">
+                <h2 class="section-title">All Expenses</h2>
+                <div id="allExpenses" class="transaction-list"></div>
+            </div>
+        </div>
+
+        <!-- Savings Section -->
+        <div id="savings" class="content-section">
+            <div class="section-card highlight">
+                <div class="savings-header">
+                    <div>
+                        <h2 class="section-title">Total Savings</h2>
+                        <div class="savings-amount" id="savingsTotal">₹0</div>
+                    </div>
+                    <button class="fab-mini" onclick="showModal('savingsModal')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 12H4"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">Savings History</h2>
+                <div id="savingsHistory" class="transaction-list"></div>
+            </div>
+        </div>
+
+        <!-- Loans Section -->
+        <div id="loans" class="content-section">
+            <div class="section-card">
+                <h2 class="section-title">Friend Loans</h2>
+                <div id="allLoans" class="transaction-list"></div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="history" class="content-section">
+            <div class="section-card">
+                <h2 class="section-title">Previous Months</h2>
+                <div id="historyList" class="history-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom navigation for Android-style navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('overview')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('expenses')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <span>Expenses</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('savings')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Savings</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('loans')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Loans</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('history')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>History</span>
+        </button>
+    </nav>
+
+    <!-- Floating action button for quick expense entry -->
+    <button class="fab" onclick="showModal('expenseModal')">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+
+    <!-- Mobile-optimized modals -->
+    <!-- New Month Modal -->
+    <div id="newMonthModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('newMonthModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title">Start New Month</h3>
+            </div>
+            
+            <form id="newMonthForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-input" id="newMonthStartDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-input" id="newMonthEndDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Amount Received</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" class="form-input" id="newMonthAmount" placeholder="0" required min="0" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="newMonthSaveCheck" onchange="toggleSavingsInput()">
+                        <span>I want to save this month</span>
+                    </label>
+                </div>
+
+                <div class="form-group" id="savingsAmountGroup" style="display: none;">
+                    <label class="form-label">Savings Amount</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" class="form-input" id="newMonthSavings" placeholder="0" min="0" step="0.01">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Start New Month</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('expenseModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title">Add Expense</h3>
+            </div>
+            
+            <form id="quickExpenseForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">What did you spend on?</label>
+                    <input type="text" class="form-input" id="quickExpenseReason" placeholder="e.g., Lunch, Transport" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" class="form-input" id="quickExpenseAmount" placeholder="0" required min="0" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Expense</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loan Modal -->
+    <div id="loanModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('loanModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title">Add Friend Loan</h3>
+            </div>
+            
+            <form id="quickLoanForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Friend Name</label>
+                    <input type="text" class="form-input" id="quickLoanFriend" placeholder="Enter name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount Given</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" class="form-input" id="quickLoanAmount" placeholder="0" required min="0" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Loan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Savings Usage Modal -->
+    <div id="savingsModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('savingsModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title">Use Savings</h3>
+            </div>
+            
+            <form id="savingsUsageForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Reason</label>
+                    <input type="text" class="form-input" id="savingsReason" placeholder="Why are you using savings?" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" class="form-input" id="savingsUsageAmount" placeholder="0" required min="0" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Use Savings</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
